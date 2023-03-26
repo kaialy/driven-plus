@@ -6,10 +6,20 @@ import PlanInfo from "./components/onboard/subscription/PlanInfo"
 import Home from "./components/onboard/homepage/Home"
 import Subscription from "./components/onboard/subscription/Subscription"
 
-export default  function App() {
-  return (
-    <div >
-      driven plus
-    </div>
-  );
+
+export default function App () {
+
+  return(
+      <DataProvider>
+          <BrowserRouter>
+              <Routes>
+                  <Route path="/" element={<Login/>} />
+                  <Route path="/sign-up" element={<SignUp/>} />
+                  <Route path="/subscriptions" element={<Subscription/>} />
+                  <Route path="/subscriptions/:planID" element={<PlanInfo/>} />
+                  <Route path="/home" element={<Home/>} />
+              </Routes>
+          </BrowserRouter>
+      </DataProvider>
+  )
 }

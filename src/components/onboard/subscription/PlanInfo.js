@@ -3,7 +3,7 @@ import { ThreeDots } from "react-loader-spinner";
 import { Grid } from "react-loader-spinner";
 import { useParams,Link } from "react-router-dom";
 import { useState, useEffect, useContext } from "react";
-import { UserContext } from "../../../context/UserContext";
+import UserContext from "../../../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import sheet from "../../../assets/sheet.png";
 import money from "../../../assets/money.png";
@@ -13,8 +13,8 @@ import axios from "axios";
 function PlanInfo () {
     const navigate = useNavigate();
 
-    const {token, data, setData} = useContext(UserContext);
-    const planID = useParams();
+    const {user,setUser} = useContext(UserContext);
+    const planID = useParams() ;
     const [plan, setPlan] = useState(null);
 
     const [cardName, setCardName] = useState("");
@@ -25,9 +25,15 @@ function PlanInfo () {
 
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isDisabled, setIsDisabled] = useState(false);
+    const config = {
+        headers: {
+          "Authorization": `Bearer ${user.token}`
+        }
+      };
+      console.log(user.plan)
 
     useEffect(()=>{
-        axios.get(`https://mock-api.driven.com.br/api/v4/driven-plus/subscriptions/memberships/${planID.planID}`, token)
+        axios.get(`https://mock-api.driven.com.br/api/v4/driven-plus/subscriptions/memberships/${planID.planID}`, config)
             .then(response => setPlan(response.data))
     },[])
     
@@ -130,24 +136,31 @@ function PlanInfo () {
         event.preventDefault();
         setIsModalVisible(true);
         setBody({
-            membershipId: parseInt(planID.planID),
+            membershipId: user.id,
             cardName: cardName,
             cardNumber: cardNumber,
-            securityNumber: parseInt(cardCVV),
+            securityNumber: cardCVV,
             expirationDate: cardExpiration
         })   
     }
 
     function purchase(){
         setIsDisabled(true);
-        axios.post('https://mock-api.driven.com.br/api/v4/driven-plus/subscriptions', body, token)
+        const body = {
+            membershipId: user.plan,
+            cardName: cardName,
+            cardNumber: cardNumber,
+            securityNumber: cardCVV,
+            expirationDate: cardExpiration,
+        }
+        axios.post('https://mock-api.driven.com.br/api/v4/driven-plus/subscriptions', body, config)
             .then((response)=>{
                 setIsDisabled(false);
-                const newObj = {...data, membership: response.data.membership};
-                setData(newObj);
+               
                 navigate("/home");
             })
             .catch((res) =>{
+                console.log(res)
                 setIsDisabled(false);
                 setIsModalVisible(false);
                 setCardCVV("");
@@ -155,7 +168,7 @@ function PlanInfo () {
                 setCardName("");
                 setCardNumber("");
                 alert("Cheque suas credenciais e tente novamente.")
-            })
+            }) 
         
     }
 

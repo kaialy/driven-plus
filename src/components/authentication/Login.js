@@ -3,17 +3,18 @@ import axios from "axios";
 import {useState, useContext, useEffect} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import logo from '../../assets/logo.png';
-import {UserContext} from "../../context/UserContext";
 import { ThreeDots } from "react-loader-spinner";
+import UserContext from "../../context/UserContext";
+
 
 function Login () {
     const navigate = useNavigate();
-    const { setData, setToken, setMembership} = useContext(UserContext)
+    const { user,setUser} = useContext(UserContext)
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
     const [isDisabled, setIsDisabled] = useState(false);
 
-    useEffect(()=>{
+    /*useEffect(()=>{
         if(localStorage.getItem("user") !== null){
             const local = JSON.parse(localStorage.getItem("user"));
             axios.post('https://mock-api.driven.com.br/api/v4/driven-plus/auth/login', local)
@@ -30,7 +31,7 @@ function Login () {
                  })
         }
         
-    },[])
+    },[]) */
     
     function validate (event){
 
@@ -44,18 +45,17 @@ function Login () {
         }
            axios.post('https://mock-api.driven.com.br/api/v4/driven-plus/auth/login', body)
                 .then((response)=>{
-                    setData(response.data);
-                    localStorage.setItem("user", JSON.stringify(body));
-                    setToken({headers:{
-                        Authorization: `Bearer ${response.data.token}`
-                   }})
-                    if(response.data.membership === null){
+                    console.log ("deu certo")
+                    setUser({...user,token:response.data.token,userName:response.data.name, membership:response.data.membership})
+                   
+                    if(response.data.membership===null ){
                         navigate("/subscriptions")
                       
                     }else{
                         navigate("/home")} 
                 })
                 .catch((res) => {
+                    console.log (res)
                     setEmail("");
                     setPassword("");
                     setIsDisabled(false);

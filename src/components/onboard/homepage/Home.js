@@ -1,19 +1,30 @@
 import styled from "styled-components";
 import axios from "axios";
-import {useContext, useState } from 'react';
+import {useContext, useEffect, useState } from 'react';
 import { useNavigate} from 'react-router-dom';
-import {UserContext} from '../../../context/UserContext'
+import UserContext from "../../../context/UserContext";
 import { Grid, ThreeDots } from "react-loader-spinner";
 import user from '../../../assets/user.png';
 
+
 function Home () {
     const navigate = useNavigate();
-    const {data, token,} = useContext(UserContext);
+    const {user,setUser} = useContext(UserContext);
     const [onLoad, setOnLoad] = useState(false);
+    const config = {
+        headers: {
+          "Authorization": `Bearer ${user.token}`
+        }
+      };
+      
+      console.log(user.plan)
+
  
+ 
+
     function cancelPlan(){
         setOnLoad(true);
-        axios.delete('https://mock-api.driven.com.br/api/v4/driven-plus/subscriptions', token)
+        axios.delete('https://mock-api.driven.com.br/api/v4/driven-plus/subscriptions', config)
              .then((response)=>{
                  setOnLoad(false);
                  navigate("/subscriptions")
@@ -26,14 +37,14 @@ function Home () {
     return(
         <Page>
             <Header>
-                    <img className="logo" src={data.membership.image} alt="DrivenPlus Logo"/>
+                    <img className="logo" src={user.membership.image} alt="DrivenPlus Logo"/>
                     <img src={user} alt="Usuário"/>
                 </Header>
                 <Content>
-                    <h1>Olá, {data.name}</h1>
-                    {data.membership.perks.map((element)=><a href={element.link} target="_blank" key={element.id}>
+                    <h1>Olá, {user.userName}</h1>
+                   {user.membership.perks.map((element)=><a href={element.link} target="_blank" key={element.id}>
                         <button>{element.title}</button>
-                    </a>)}
+    </a>)}
                 </Content>
                 <Footer>
                     <button onClick={()=>{

@@ -2,17 +2,21 @@ import styled from "styled-components";
 import axios from "axios";
 import {useState, useContext, useEffect} from 'react';
 import { useNavigate } from "react-router-dom";
-import {UserContext} from '../../../context/UserContext'
+import UserContext from "../../../context/UserContext";
 import { Grid} from "react-loader-spinner";
 function Subscription () {
     const navigate = useNavigate();
-    const {token, data} = useContext(UserContext);
+    const {user,setUser} = useContext(UserContext);
     const [plans, setPlans] = useState(null);
-    
+    const config = {
+        headers: {
+          "Authorization": `Bearer ${user.token}`
+        }
+      };
     useEffect(()=>{
-       const promise = axios.get('https://mock-api.driven.com.br/api/v4/driven-plus/subscriptions/memberships',token)
+       const promise = axios.get('https://mock-api.driven.com.br/api/v4/driven-plus/subscriptions/memberships',config)
         promise.then(response => setPlans(response.data))
-    },[token])
+    },[])
     
     function loadIt (){
         if(plans !== null){
@@ -33,7 +37,8 @@ function Subscription () {
         }
     }
 
-    function choose (id){
+    function choose (id){ 
+        setUser({...user,plan:id})
         navigate(`/subscriptions/${id}`)
     }
 
